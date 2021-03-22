@@ -1,13 +1,14 @@
 const MongoClient = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectID
 const dbName = 'tellMeMore'
-const url = 'mongodb://localhost:27017' + dbName
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017' + dbName
 let db
 
+console.log(url)
 MongoClient.connect(url, (err, client) => {
+   if(err) throw err
    console.log("Successfully connected to the server")
    db = client.db(dbName)
-   if(err) throw err
    db.createCollection('forms', {}, (err, _) => {
         if (err) {}
     })
