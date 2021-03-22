@@ -1,6 +1,7 @@
-const MongoClient = require('mongodb').MongoClient;
-const dbName = 'tellMeMore';
-const url = 'mongodb://localhost:27017' + dbName;
+const MongoClient = require('mongodb').MongoClient
+const ObjectId = require('mongodb').ObjectID
+const dbName = 'tellMeMore'
+const url = 'mongodb://localhost:27017' + dbName
 let db
 
 MongoClient.connect(url, (err, client) => {
@@ -47,5 +48,16 @@ exports.getForms = (req, res) => {
 }
 
 exports.getFormData = (req, res) => {
-
+    if (!req.query.id) {
+        res.status(400).json({message: 'Bad request'})
+        return
+    }
+    console.log(req.query.id)
+    db.collection('forms').findOne({_id: new ObjectId(req.query.id)})
+        .then(docs => res.status(200).json(docs))
+        .catch(err => {
+            console.log(err)
+            throw err
+        })
+    return
 }
