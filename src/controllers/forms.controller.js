@@ -34,8 +34,21 @@ exports.updateForm = (req, res) => {
 
 }
 
-exports.deleteForm = (req, res) => {
-
+exports.deleteForm = async (req, res) => {
+    if (!req.query.id) {
+        res.status(400).json({message: 'Bad request'})
+        return
+    }
+    db.collection('forms').deleteOne({_id: new ObjectId(req.query.id)})
+        .then(result => {
+            if (result.deletedCount === 1) {
+                res.status(200).json({message: 'Successfully deleted the form'})
+                return
+            } else {
+                res.status(404).json({message: 'No form using this id was found. Nothing was deleted'})
+                return
+            } 
+        })
 }
 
 exports.getForms = (req, res) => {
