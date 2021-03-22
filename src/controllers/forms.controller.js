@@ -4,7 +4,6 @@ const dbName = 'tellMeMore'
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017' + dbName
 let db
 
-console.log(url)
 MongoClient.connect(url, (err, client) => {
    if(err) throw err
    console.log("Successfully connected to the server")
