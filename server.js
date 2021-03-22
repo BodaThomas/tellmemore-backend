@@ -12,6 +12,7 @@ app.get('/', (_, res) => {
 })
 
 app.use('/', require('./src/routes/forms.route'))
+app.use('/', require('./src/routes/results.route'))
 
 app.listen(app.get('PORT'), () => {
     console.log(`Server running on port ${app.get('PORT')}`)
