@@ -31,46 +31,79 @@ exports.createForm = (req, res) => {
 }
 
 exports.updateForm = (req, res) => {
-
+    if (!req.body.id) {
+        res.status(400).json({message: 'Bad request. You must provide a form id'})
+        return
+    }
+    try {
+        db.collection('forms').updateOne({_id: new ObjectId(req.body.id)}, {$set: {name: req.body.name, data: req.body.data}})
+            .then(result => {
+                if (result.modifiedCount === 1) {
+                    res.status(200).json({message: 'Successfully updated the form'})
+                    return
+                } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
+                    res.status(200).json({message: 'The form is already updated'})
+                    return
+                } else {
+                    res.status(404).json({message: 'No form using this id was found. Nothing was updated'})
+                    return
+                }
+            })
+            return
+    } catch (err) {
+        res.status(400).json({message: 'Bad request'})
+        return
+    }
 }
 
 exports.deleteForm = async (req, res) => {
     if (!req.query.id) {
+        res.status(400).json({message: 'Bad request. You must provide a form id'})
+        return
+    }
+    try {
+        db.collection('forms').deleteOne({_id: new ObjectId(req.query.id)})
+            .then(result => {
+                if (result.deletedCount === 1) {
+                    res.status(200).json({message: 'Successfully deleted the form'})
+                    return
+                } else {
+                    res.status(404).json({message: 'No form using this id was found. Nothing was deleted'})
+                    return
+                } 
+            })
+        return
+    } catch (err) {
         res.status(400).json({message: 'Bad request'})
         return
     }
-    db.collection('forms').deleteOne({_id: new ObjectId(req.query.id)})
-        .then(result => {
-            if (result.deletedCount === 1) {
-                res.status(200).json({message: 'Successfully deleted the form'})
-                return
-            } else {
-                res.status(404).json({message: 'No form using this id was found. Nothing was deleted'})
-                return
-            } 
-        })
 }
 
-exports.getForms = (req, res) => {
+exports.getForms = (_, res) => {
     db.collection('forms').find({}).toArray()
         .then(docs => res.status(200).json(docs))
         .catch(err => {
             console.log(err)
             throw err
         })
+    return
 }
 
 exports.getFormData = (req, res) => {
     if (!req.query.id) {
+        res.status(400).json({message: 'Bad request. You must provide a form id'})
+        return
+    }
+    try {
+        db.collection('forms').findOne({_id: new ObjectId(req.query.id)})
+            .then(docs => res.status(200).json(docs))
+            .catch(err => {
+                console.log(err)
+                throw err
+            })
+            return
+    } catch (err) {
         res.status(400).json({message: 'Bad request'})
         return
     }
-    console.log(req.query.id)
-    db.collection('forms').findOne({_id: new ObjectId(req.query.id)})
-        .then(docs => res.status(200).json(docs))
-        .catch(err => {
-            console.log(err)
-            throw err
-        })
-    return
 }
